@@ -1,0 +1,51 @@
+div#container {
+    margin: auto 10%;
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 240px;
+
+}
+
+div.result {
+    flex: 1 1 100%;
+    background-color:  rgb(178, 204, 201);   
+    font-size: 2em;
+    height: 2.5em;
+
+}
+
+div.input {
+    flex: 1 1 70%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+div.input > div {
+    flex: 1 1 30%;
+    height: 2em;
+
+}
+div.op {
+    flex: 1 1 30%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+div.op > div {
+    flex: 1;
+}
+
+div.op > div, div.input > div {    
+    border: 1px solid rgb(146, 146, 146);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(200, 243, 229);
+
+}
+
+div.op > div:hover, div.input > div:hover {   
+    background-color: rgb(148, 233, 204);
+
+}
