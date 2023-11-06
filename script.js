@@ -45,3 +45,40 @@ container.appendChild(result)
 container.appendChild(inputArea);
 container.appendChild(opArea)
 
+let value = "";
+let answer;
+
+function updateDisplay(text){
+    if (text === "C"){
+        result.textContent = "";
+    }
+    else {result.textContent += text}
+}
+
+
+container.addEventListener("click", (e) => {
+    let text = e.target.textContent;
+    value += text;
+    console.log(value)
+    if (text === "="){
+        // Check if logic is correct
+        if (OPERATORS.concat(".").includes(value.slice(0,1))){
+            updateDisplay("C");
+            updateDisplay("Error!")
+        }
+        // If incorrect, return error message
+
+
+        // If correct, return evaluation
+        return;
+}
+
+else if (text === "C"){
+    updateDisplay(text);
+    value = "";
+}
+else {
+    updateDisplay(text);
+}
+
+})
