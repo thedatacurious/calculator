@@ -10,7 +10,7 @@ let num2;
 let operator;
 
 const operate = function (num1, operator, num2) {
-  return methods[operator](num1)(num2);
+  return methods[operator](num1, num2);
 };
 
 const container = document.querySelector("#container");
@@ -67,22 +67,32 @@ function clickFunc(e){
     let text = e.target.textContent;
     value += text;
     console.log(value);
-    if (text === "=") {
-      // Check if logic is correct; if incorrect, return error message
-  
-      if (OPERATORS.concat(".").includes(value.slice(0, 1))) {
-        updateDisplay("C");
-        updateDisplay("Error!");
-      }
-      // If correct, return evaluation
+    updateDisplay(text);
 
-  
+    let numArr = Array.from(value.matchAll(/\d{1,}\.{0,1}\d{0,}/g)).flat();
+    let opArr = value.split(/\d{1,}/).filter( d => d !== "" && d !== "=" && d !==".");
+
+    // Check if input meets format of [num] [op] [num]
+    if (numArr.length === 2 && opArr.length === 1) {
+        [num1, num2] = numArr.map(d => Number(d));
+        operator = opArr[0];
+    
+        // Then check if logic is correct; if incorrect, return error message
+      if (OPERATORS.concat(".").includes(value.slice(0, 1)) || value.match(/\.{2,}/)
+     || value.match("÷0")) {
+        updateDisplay("C");
+        updateDisplay("Error! Please clear and start again");
+      }
+
+      // Otherwise,if logic is correct, evaluate and return result
+      value = operate(num1, operator, num2)
+      updateDisplay("C");
+      updateDisplay(value);
+
     } else if (text === "C") {
       updateDisplay(text);
       value = "";
-    } else {
-      updateDisplay(text);
-    }
+    } 
   }
 
 inputArea.addEventListener("click", clickFunc);
