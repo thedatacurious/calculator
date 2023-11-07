@@ -32,11 +32,15 @@ const NUMS = Array.from(Array(9).keys()).map((d) => d + 1);
 const INPUTS = NUMS.concat(["C", 0, "."]);
 
 const OPERATORS = ["+", "−", "×", "÷", "="];
+
 for (const i of INPUTS) {
   let div = document.createElement("div");
   div.textContent = i;
   if (i === ".") {
     div.setAttribute("class", "decimal");
+  }
+  else if (i === "C") {
+    div.setAttribute("class", "cancel");
   }
   numArea.appendChild(div);
 }
@@ -44,6 +48,7 @@ for (const i of INPUTS) {
 for (const i of OPERATORS) {
   let div = document.createElement("div");
   div.textContent = i;
+
   opArea.appendChild(div);
 }
 
