@@ -17,6 +17,7 @@ div.input {
     display: flex;
     flex: 1 1 100%;
     flex-wrap: wrap;
+    pointer-events: auto;
 }
 
 div.num {

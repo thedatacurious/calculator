@@ -35,6 +35,9 @@ const OPERATORS = ["+", "−", "×", "÷", "="];
 for (const i of INPUTS) {
   let div = document.createElement("div");
   div.textContent = i;
+  if (i === ".") {
+    div.setAttribute("class", "decimal");
+  }
   numArea.appendChild(div);
 }
 
@@ -51,7 +54,8 @@ container.appendChild(result);
 container.appendChild(inputArea);
 
 let value = "";
-let answer;
+let is_eval = false;
+let allow_decimal = true;
 
 function updateDisplay(text) {
   if (
@@ -69,21 +73,45 @@ function updateDisplay(text) {
 
 function clickFunc(e) {
   let text = e.target.textContent;
+
+  if (text === "."){
+    text = allow_decimal ? "." : "";
+  }
+
   value += text;
+
   console.log(value);
 
-  let numArr = Array.from(value.matchAll(/\-{0,1}\.{0,1}\d{1,}\.{0,1}\d{0,}/g)).flat();
+  let numArr = Array.from(
+    value.matchAll(/\-{0,1}\.{0,1}\d{1,}\.{0,1}\d{0,}/g)
+  ).flat();
   let opArr = value
     .split(/\.{0,1}\d{1,}/)
     .filter((d) => d !== "" && d !== "." && d !== "-");
   console.log(numArr, opArr);
 
-
-
   // If user enters [num] after receiving a result, reset to the new [num]
-  if (numArr.length === 2 && opArr[0] === "=") {
-    value = numArr[1];
+  if (is_eval && NUMS.includes(Number(text))) {
     updateDisplay("C");
+    value = text;
+    is_eval = false;
+  }
+
+
+
+  // Disable decimal button if 1) 1st num already has a decimal
+  // 2) 2nd num already has a decimal if input is [num] [op] [num]
+
+  let decimalBtn = document.querySelector(".decimal")
+  if (text === "." && numArr.length === 1 && numArr[0].includes(".") || text === "." && numArr.length > 1 && numArr[1].includes(".") ){
+    allow_decimal = false;
+    decimalBtn.style.setProperty('opacity', '0.5');
+
+  }
+
+  if (numArr.length > 1 && !numArr[1].includes(".")){
+    allow_decimal = true;
+    decimalBtn.style.setProperty('opacity', '1');
   }
 
   updateDisplay(text);
@@ -93,11 +121,11 @@ function clickFunc(e) {
     [num1, num2] = numArr.map((d) => Number(d));
     operator = opArr[0];
 
-
     // Then check if logic is correct; if incorrect, return error message
     if (
       OPERATORS.includes(value.slice(0, 1)) ||
-      opArr[0].length > 1 || numArr.length === 1 && opArr.length === 1
+      opArr[0].length > 1 ||
+      (numArr.length === 1 && opArr.length === 1)
     ) {
       updateDisplay("C");
       updateDisplay("Error! Please clear and start again");
@@ -116,6 +144,9 @@ function clickFunc(e) {
       value = value.replace("=", "");
       updateDisplay("C");
       updateDisplay(value);
+      is_eval = true;
+      allow_decimal = true;
+      decimalBtn.style.setProperty('opacity', '1');
     }
   } else if (text === "C") {
     updateDisplay(text);
