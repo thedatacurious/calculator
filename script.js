@@ -23,7 +23,7 @@ const opArea = document.createElement("div");
 opArea.setAttribute("class", "op");
 
 // To contain the divs for number and operator buttons
-const inputArea = document.createElement("div")
+const inputArea = document.createElement("div");
 inputArea.setAttribute("class", "input");
 
 // Get 1-9 in an array
@@ -48,14 +48,18 @@ inputArea.appendChild(numArea);
 inputArea.appendChild(opArea);
 
 container.appendChild(result);
-container.appendChild(inputArea)
-
-
+container.appendChild(inputArea);
 
 let value = "";
 let answer;
 
 function updateDisplay(text) {
+  if (
+    result.textContent.match("Error! Please clear and start again") ||
+    result.textContent.match("Are you trying to be funny?")
+  ) {
+    result.textContent = "";
+  }
   if (text === "C") {
     result.textContent = "";
   } else {
@@ -63,36 +67,60 @@ function updateDisplay(text) {
   }
 }
 
-function clickFunc(e){
-    let text = e.target.textContent;
-    value += text;
-    console.log(value);
-    updateDisplay(text);
+function clickFunc(e) {
+  let text = e.target.textContent;
+  value += text;
+  console.log(value);
 
-    let numArr = Array.from(value.matchAll(/\d{1,}\.{0,1}\d{0,}/g)).flat();
-    let opArr = value.split(/\d{1,}/).filter( d => d !== "" && d !== "=" && d !==".");
+  let numArr = Array.from(value.matchAll(/\-{0,1}\.{0,1}\d{1,}\.{0,1}\d{0,}/g)).flat();
+  let opArr = value
+    .split(/\.{0,1}\d{1,}/)
+    .filter((d) => d !== "" && d !== "." && d !== "-");
+  console.log(numArr, opArr);
 
-    // Check if input meets format of [num] [op] [num]
-    if (numArr.length === 2 && opArr.length === 1) {
-        [num1, num2] = numArr.map(d => Number(d));
-        operator = opArr[0];
-    
-        // Then check if logic is correct; if incorrect, return error message
-      if (OPERATORS.concat(".").includes(value.slice(0, 1)) || value.match(/\.{2,}/)
-     || value.match("÷0")) {
-        updateDisplay("C");
-        updateDisplay("Error! Please clear and start again");
-      }
 
-      // Otherwise,if logic is correct, evaluate and return result
-      value = operate(num1, operator, num2)
+
+  // If user enters [num] after receiving a result, reset to the new [num]
+  if (numArr.length === 2 && opArr[0] === "=") {
+    value = numArr[1];
+    updateDisplay("C");
+  }
+
+  updateDisplay(text);
+
+  // If user enters "=" or a 2nd operator after entering [num] [op] [num]
+  if (text === "=" || (numArr.length === 2 && opArr.length === 2)) {
+    [num1, num2] = numArr.map((d) => Number(d));
+    operator = opArr[0];
+
+
+    // Then check if logic is correct; if incorrect, return error message
+    if (
+      OPERATORS.includes(value.slice(0, 1)) ||
+      opArr[0].length > 1 || numArr.length === 1 && opArr.length === 1
+    ) {
+      updateDisplay("C");
+      updateDisplay("Error! Please clear and start again");
+      value = "";
+    } else if (num2 === 0 && operator === "÷") {
+      updateDisplay("C");
+      updateDisplay("Are you trying to be funny?");
+      value = "";
+    }
+
+    // Otherwise,if logic is correct, evaluate
+    else {
+      let roundedValue = Math.round(operate(num1, operator, num2) * 100) / 100;
+      // If 2nd operator is "=", display only the result. Otherwise, display result & next operator
+      value = roundedValue.toString() + opArr[1];
+      value = value.replace("=", "");
       updateDisplay("C");
       updateDisplay(value);
-
-    } else if (text === "C") {
-      updateDisplay(text);
-      value = "";
-    } 
+    }
+  } else if (text === "C") {
+    updateDisplay(text);
+    value = "";
   }
+}
 
 inputArea.addEventListener("click", clickFunc);
